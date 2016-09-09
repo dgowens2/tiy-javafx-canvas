@@ -34,6 +34,7 @@ public class Controller implements Initializable {
 
 
     public String username;
+    public int userId;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -87,8 +88,8 @@ public class Controller implements Initializable {
     public void addItem() {
         try {
             System.out.println("Adding item ...");
+            database.insertToDo(conn, todoText.getText(), userId);
             todoItems.add(new ToDoItem(todoText.getText()));
-            database.insertToDo(conn, todoText.getText());
 
             todoText.setText("");
         } catch (Exception exception) {

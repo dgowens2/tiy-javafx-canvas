@@ -17,6 +17,8 @@ public class SampleFXMLApp extends Application {
         System.out.println("Welcome to the TIY TODO App");
 
         launch(args);
+
+//        SELECT * FROM FROM todod INNER JOIN users ON users.id = todo.user_id WHERE users.id = 1
     }
 
     @Override
