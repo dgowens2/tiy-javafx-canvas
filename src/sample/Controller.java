@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Scanner;
@@ -27,27 +29,46 @@ public class Controller implements Initializable {
     ObservableList<ToDoItem> todoItems = FXCollections.observableArrayList();
     ArrayList<ToDoItem> savableList = new ArrayList<ToDoItem>();
     String fileName = "todos.json";
+    ToDoDatabase database;
+    Connection conn;
+
 
     public String username;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        System.out.print("Please enter your name: ");
-        Scanner inputScanner = new Scanner(System.in);
-        username = inputScanner.nextLine();
+//        System.out.print("Please enter your name: ");
+//        Scanner inputScanner = new Scanner(System.in);
+//        username = inputScanner.nextLine();
 
-        if (username != null && !username.isEmpty()) {
-            fileName = username + ".json";
-        }
+//        if (username != null && !username.isEmpty()) {
+//            fileName = username + ".json";
+//        }
 
         System.out.println("Checking existing list ...");
-        ToDoItemList retrievedList = retrieveList();
-        if (retrievedList != null) {
-            for (ToDoItem item : retrievedList.todoItems) {
+//        ToDoItemList retrievedList = retrieveList();
+        database = new ToDoDatabase();
+
+        try {
+            database.init();
+            conn = DriverManager.getConnection(database.DB_URL);
+            savableList = database.selectToDos(conn);
+
+            for (ToDoItem item : savableList) {
                 todoItems.add(item);
             }
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
+
+
+//        if (retrievedList != null) {
+//            for (ToDoItem item : retrievedList.todoItems) {
+//                todoItems.add(item);
+//            }
+//        }
 
         todoList.setItems(todoItems);
     }
@@ -64,25 +85,42 @@ public class Controller implements Initializable {
     }
 
     public void addItem() {
-        System.out.println("Adding item ...");
-        todoItems.add(new ToDoItem(todoText.getText()));
-        todoText.setText("");
+        try {
+            System.out.println("Adding item ...");
+            todoItems.add(new ToDoItem(todoText.getText()));
+            database.insertToDo(conn, todoText.getText());
+
+            todoText.setText("");
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     public void removeItem() {
-        ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
-        System.out.println("Removing " + todoItem.text + " ...");
-        todoItems.remove(todoItem);
+        try {
+            ToDoItem todoItem = (ToDoItem) todoList.getSelectionModel().getSelectedItem();
+            System.out.println("Removing " + todoItem.text + " ...");
+            todoItems.remove(todoItem);
+            database.deleteToDo(conn, todoItem.text);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     public void toggleItem() {
-        System.out.println("Toggling item ...");
-        ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
-        if (todoItem != null) {
-            todoItem.isDone = !todoItem.isDone;
-            todoList.setItems(null);
-            todoList.setItems(todoItems);
+        try {
+            System.out.println("Toggling item ...");
+            ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
+            if (todoItem != null) {
+                todoItem.isDone = !todoItem.isDone;
+                todoList.setItems(null);
+                todoList.setItems(todoItems);
+                database.toggleToDo(conn, todoItem.id);
+            }
+        } catch (Exception exception){
+            exception.printStackTrace();
         }
+
     }
 
     public void saveList() {

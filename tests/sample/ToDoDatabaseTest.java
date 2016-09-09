@@ -115,5 +115,30 @@ public class ToDoDatabaseTest {
         todoDatabase.deleteToDo(conn, secondToDoText);
     }
 
-
+//    @Test
+//    public void testToggleToDo() throws Exception {
+//        Connection conn = DriverManager.getConnection(ToDoDatabase.DB_URL);
+//        String todoToggleText = "UnitTest-ToDoToggle";
+//
+//        todoDatabase.insertToDo(conn, todoToggleText);
+//
+//        // make sure we can retrieve the todo we just created
+//        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos WHERE text = ?");
+//        stmt.setString(1, todoToggleText);
+//        ResultSet results = stmt.executeQuery();
+//        assertNotNull(results);
+//        // count the records in results to make sure we get what we expected
+//        int numResults = 0;
+//        while (results.next()) {
+//            numResults++;
+//        }
+//
+//        todoDatabase.toggleToDo(conn, numResults);
+//
+//        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos WHERE text = ?");
+//        stmt.setString(1, todoToggleText);
+//        ResultSet results = stmt.executeQuery();
+//        assertNotNull(results);
+//
+//    }
 }
