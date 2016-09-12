@@ -7,14 +7,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import jodd.json.JsonParser;
-import jodd.json.JsonSerializer;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Scanner;
@@ -31,45 +28,47 @@ public class Controller implements Initializable {
     String fileName = "todos.json";
     ToDoDatabase database;
     Connection conn;
-
-
     public String username;
     public int userId;
+    Users thisUser;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-//        System.out.print("Please enter your name: ");
-//        Scanner inputScanner = new Scanner(System.in);
-//        username = inputScanner.nextLine();
+        System.out.print("Please enter your email address: ");
+        Scanner inputScanner = new Scanner(System.in);
+        username = inputScanner.nextLine();
 
-//        if (username != null && !username.isEmpty()) {
+        if (username != null && !username.isEmpty()) {
 //            fileName = username + ".json";
-//        }
-
-        System.out.println("Checking existing list ...");
-//        ToDoItemList retrievedList = retrieveList();
-        database = new ToDoDatabase();
-
-        try {
-            database.init();
-            conn = DriverManager.getConnection(database.DB_URL);
-            savableList = database.selectToDos(conn);
-
-            for (ToDoItem item : savableList) {
-                todoItems.add(item);
-            }
-
-        } catch (Exception exception) {
-            exception.printStackTrace();
+            fileName = username + ".db";
         }
 
+        System.out.println("Checking existing list ...");
+        ToDoItemList retrievedList = retrieveList();
+        database = new ToDoDatabase();
 
-//        if (retrievedList != null) {
-//            for (ToDoItem item : retrievedList.todoItems) {
+        if (retrievedList != null) {
+            for (ToDoItem item : retrievedList.todoItems) {
+                todoItems.add(item);
+            }
+        }
+
+//        try {
+//            database.init();
+//            conn = DriverManager.getConnection(database.DB_URL);
+//            savableList = database.selectToDos(conn);
+//
+//            for (ToDoItem item : savableList) {
 //                todoItems.add(item);
 //            }
+//
+//        } catch (Exception exception) {
+//            exception.printStackTrace();
 //        }
+
+
+
 
         todoList.setItems(todoItems);
     }
@@ -88,6 +87,19 @@ public class Controller implements Initializable {
     public void addItem() {
         try {
             System.out.println("Adding item ...");
+            database.insertToDo(conn, todoText.getText(), userId);
+            todoItems.add(new ToDoItem(todoText.getText()));
+
+            todoText.setText("");
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    public void addUser() {
+        try {
+            System.out.println("Adding item ...");
+//            database.insertUser(conn, username, );
             database.insertToDo(conn, todoText.getText(), userId);
             todoItems.add(new ToDoItem(todoText.getText()));
 
@@ -128,16 +140,16 @@ public class Controller implements Initializable {
         try {
 
             // write JSON
-            JsonSerializer jsonSerializer = new JsonSerializer().deep(true);
-            String jsonString = jsonSerializer.serialize(new ToDoItemList(todoItems));
-
-            System.out.println("JSON = ");
-            System.out.println(jsonString);
-
-            File sampleFile = new File(fileName);
-            FileWriter jsonWriter = new FileWriter(sampleFile);
-            jsonWriter.write(jsonString);
-            jsonWriter.close();
+//            JsonSerializer jsonSerializer = new JsonSerializer().deep(true);
+//            String jsonString = jsonSerializer.serialize(new ToDoItemList(todoItems));
+//
+//            System.out.println("JSON = ");
+//            System.out.println(jsonString);
+//
+//            File sampleFile = new File(fileName);
+//            FileWriter jsonWriter = new FileWriter(sampleFile);
+//            jsonWriter.write(jsonString);
+//            jsonWriter.close();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
