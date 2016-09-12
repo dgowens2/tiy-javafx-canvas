@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 public class ToDoDatabaseTest {
 
         ToDoDatabase todoDatabase = null;
+        ToDoItem myToDoItem = new ToDoItem();
 
         @Before
         public void setUp() throws Exception {
@@ -115,14 +116,35 @@ public class ToDoDatabaseTest {
             todoDatabase.deleteToDo(conn, secondToDoText);
         }
 
-//        @Test
-//        public void testToggleToDo() throws Exception {
-//            Connection conn = DriverManager.getConnection(ToDoDatabase.DB_URL);
-//            String todoText = "UnitTest(Toggle)-ToDo";
-//            int id;
+        @Test
+        public void testToggleToDo() throws Exception {
+            Connection conn = DriverManager.getConnection(ToDoDatabase.DB_URL);
+            String todoText = "UnitTest(Toggle)-ToDo";
+            myToDoItem.text = todoText;
+
+            todoDatabase.insertToDo(conn, todoText);
+
+            System.out.println(myToDoItem.id + " " + myToDoItem.text + " " + myToDoItem.isDone);
+
+            todoDatabase.toggleToDo(conn, myToDoItem.id);
 //
-//            todoDatabase.insertToDo(conn, todoText);
+            conn = DriverManager.getConnection(ToDoDatabase.DB_URL);
 //
+            System.out.println(conn + " " + myToDoItem.id + " " + myToDoItem.text + " " + myToDoItem.isDone);
+
+            for (int counter = 0; counter > todoText.length(); counter++) {
+                todoDatabase.deleteToDo(conn, todoText);
+            }
+
+            System.out.println();
+
+//
+
+//            PreparedStatement stmt = conn.prepareStatement("SELECT id FROM todos WHERE text = ?");
+//            stmt.setString(1, todoText);
+//            ResultSet results = stmt.executeQuery();
+//            System.out.println(results);
+
 //            // make sure we can retrieve the todo we just created
 //            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos WHERE text = ?");
 //            stmt.setString(1, todoText);
@@ -137,9 +159,13 @@ public class ToDoDatabaseTest {
 //
 //            assertEquals(1, numResults);
 //
-//            todoDatabase.toggleToDo(conn, id);
+//            System.out.println(todoText + " " + todoText.indexOf(0));
 //
-//            System.out.println(results + " " + );
+//            todoDatabase.toggleToDo(conn, 0);
+//            todoDatabase.toggleToDo(conn, 0);
+//
+//
+//            System.out.println(todoText + " " + results);
 //
 //
 //            todoDatabase.deleteToDo(conn, todoText);
@@ -151,6 +177,6 @@ public class ToDoDatabaseTest {
 //                numResults++;
 //            }
 //            assertEquals(0, numResults);
-//
-//        }
+
+        }
     }

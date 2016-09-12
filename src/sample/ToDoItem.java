@@ -20,6 +20,14 @@ public class ToDoItem {
     public ToDoItem(String text) {
     }
 
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public void setDone(boolean done) {
+        isDone = done;
+    }
+
     @Override
     public String toString() {
         if (isDone) {
