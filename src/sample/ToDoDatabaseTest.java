@@ -20,7 +20,6 @@ import static org.junit.Assert.assertTrue;
 public class ToDoDatabaseTest {
 
         ToDoDatabase todoDatabase = null;
-        ToDoItem myToDoItem = new ToDoItem();
 
         @Before
         public void setUp() throws Exception {
@@ -99,13 +98,11 @@ public class ToDoDatabaseTest {
             Connection conn = DriverManager.getConnection(ToDoDatabase.DB_URL);
             String firstToDoText = "UnitTest-ToDo1";
             String secondToDoText = "UnitTest-ToDo2";
-//        String secondToDoText2 = "UnitTest-ToDo2.1";
 
             todoDatabase.insertToDo(conn, firstToDoText);
             todoDatabase.insertToDo(conn, secondToDoText);
 
             ArrayList<ToDoItem> todos = todoDatabase.selectToDos(conn);
-//        int todosBefore = todos.size();
 
             System.out.println("Found " + todos.size() + " todos in the database");
 
@@ -120,63 +117,34 @@ public class ToDoDatabaseTest {
         public void testToggleToDo() throws Exception {
             Connection conn = DriverManager.getConnection(ToDoDatabase.DB_URL);
             String todoText = "UnitTest(Toggle)-ToDo";
-            myToDoItem.text = todoText;
 
             todoDatabase.insertToDo(conn, todoText);
 
-            System.out.println(myToDoItem.id + " " + myToDoItem.text + " " + myToDoItem.isDone);
+            // make sure we can retrieve the todo we just created
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos WHERE text = ?");
+            stmt.setString(1, todoText);
+            ResultSet results = stmt.executeQuery();
+            results.next();
 
-            todoDatabase.toggleToDo(conn, myToDoItem.id);
-//
-            conn = DriverManager.getConnection(ToDoDatabase.DB_URL);
-//
-            System.out.println(conn + " " + myToDoItem.id + " " + myToDoItem.text + " " + myToDoItem.isDone);
+            int todoToggleId = results.getInt("id");
 
-            for (int counter = 0; counter > todoText.length(); counter++) {
-                todoDatabase.deleteToDo(conn, todoText);
-            }
+            boolean preToggle = results.getBoolean("is_done");
 
-            System.out.println();
+            System.out.println(preToggle);
 
-//
+            todoDatabase.toggleToDo(conn ,todoToggleId);
 
-//            PreparedStatement stmt = conn.prepareStatement("SELECT id FROM todos WHERE text = ?");
-//            stmt.setString(1, todoText);
-//            ResultSet results = stmt.executeQuery();
-//            System.out.println(results);
+            results = stmt.executeQuery();
 
-//            // make sure we can retrieve the todo we just created
-//            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos WHERE text = ?");
-//            stmt.setString(1, todoText);
-//            ResultSet results = stmt.executeQuery();
-//            assertNotNull(results);
-//
-//            // count the records in results to make sure we get what we expected
-//            int numResults = 0;
-//            while (results.next()) {
-//                numResults++;
-//            }
-//
-//            assertEquals(1, numResults);
-//
-//            System.out.println(todoText + " " + todoText.indexOf(0));
-//
-//            todoDatabase.toggleToDo(conn, 0);
-//            todoDatabase.toggleToDo(conn, 0);
-//
-//
-//            System.out.println(todoText + " " + results);
-//
-//
-//            todoDatabase.deleteToDo(conn, todoText);
-//
-//            // make sure there are no more records for our test todo
-//            results = stmt.executeQuery();
-//            numResults = 0;
-//            while (results.next()) {
-//                numResults++;
-//            }
-//            assertEquals(0, numResults);
+            results.next();
+
+            boolean postToggle = results.getBoolean("is_done");
+
+            System.out.println(postToggle);
+
+            assertTrue(preToggle != postToggle);
+
+            todoDatabase.deleteToDo(conn, todoText);
 
         }
     }

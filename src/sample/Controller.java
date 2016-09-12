@@ -54,14 +54,16 @@ public class Controller implements Initializable {
             conn = DriverManager.getConnection(database.DB_URL);
             savableList = database.selectToDos(conn);
 
-//            for (ToDoItem item : savableList) {
-//                todoItems.add(item);
-//            }
+
+            for (ToDoItem item : savableList) {
+                todoItems.add(item);
+            }
 
         } catch (Exception exception) {
             exception.printStackTrace();
         }
 
+        todoList.setItems(todoItems);
 
 //        if (retrievedList != null) {
 //            for (ToDoItem item : retrievedList.todoItems) {
@@ -69,7 +71,6 @@ public class Controller implements Initializable {
 //            }
 //        }
 
-        todoList.setItems(todoItems);
     }
 
     public void saveToDoList() {
@@ -86,8 +87,8 @@ public class Controller implements Initializable {
     public void addItem() {
         try {
             System.out.println("Adding item ...");
-            todoItems.add(new ToDoItem(todoText.getText()));
-            database.insertToDo(conn, todoText.getText());
+            int todoId = database.insertToDo(conn, todoText.getText());
+            todoItems.add(new ToDoItem(todoId, todoText.getText(), false));
             todoText.setText("");
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -109,11 +110,11 @@ public class Controller implements Initializable {
         try {
             System.out.println("Toggling item ...");
             ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
+            database.toggleToDo(conn,todoItem.getId());
             if (todoItem != null) {
                 todoItem.isDone = !todoItem.isDone;
                 todoList.setItems(null);
                 todoList.setItems(todoItems);
-                database.toggleToDo(conn, todoItem.id);
                 System.out.println("Item toggled");
             }
         } catch (Exception exception){

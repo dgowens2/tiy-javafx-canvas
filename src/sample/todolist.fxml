@@ -20,6 +20,6 @@
             <TextField fx:id="todoText" onAction="#addItem" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
-      <ListView fx:id="todoList" onMouseClicked="#toggleItem" prefHeight="308.0" prefWidth="600.0" />
+      <ListView fx:id="todoList" onMouseClicked="#toggleItem" />
    </children>
 </VBox>

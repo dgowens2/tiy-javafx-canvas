@@ -14,10 +14,22 @@ public class ToDoItem {
         this.isDone = isDone;
     }
 
-    public ToDoItem() {
+    public ToDoItem(String text) {
+        this.text = text;
+        this.isDone = false;
     }
 
-    public ToDoItem(String text) {
+    public ToDoItem(int id) {
+        this.id = id;
+    }
+
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public boolean isDone() {
