@@ -6,10 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import jodd.json.JsonParser;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -25,7 +22,7 @@ public class Controller implements Initializable {
 
     ObservableList<ToDoItem> todoItems = FXCollections.observableArrayList();
     ArrayList<ToDoItem> savableList = new ArrayList<ToDoItem>();
-    String fileName = "todos.json";
+    String fileName = "todos.db";
     ToDoDatabase database;
     Connection conn;
     public String username;
@@ -37,22 +34,22 @@ public class Controller implements Initializable {
 
         System.out.print("Please enter your email address: ");
         Scanner inputScanner = new Scanner(System.in);
-        username = inputScanner.nextLine();
+        thisUser.setUsername(inputScanner.nextLine());
 
-        if (username != null && !username.isEmpty()) {
+        if (thisUser.getUsername() != null) {
 //            fileName = username + ".json";
-            fileName = username + ".db";
+            fileName = thisUser.getUsername() + ".db";
         }
 
         System.out.println("Checking existing list ...");
-        ToDoItemList retrievedList = retrieveList();
+//        ToDoItemList retrievedList = retrieveList();
         database = new ToDoDatabase();
 
-        if (retrievedList != null) {
-            for (ToDoItem item : retrievedList.todoItems) {
-                todoItems.add(item);
-            }
-        }
+//        if (retrievedList != null) {
+//            for (ToDoItem item : retrievedList.todoItems) {
+//                todoItems.add(item);
+//            }
+//        }
 
 //        try {
 //            database.init();
@@ -155,24 +152,24 @@ public class Controller implements Initializable {
         }
     }
 
-    public ToDoItemList retrieveList() {
-        try {
-
-            Scanner fileScanner = new Scanner(new File(fileName));
-            fileScanner.useDelimiter("\\Z"); // read the input until the "end of the input" delimiter
-            String fileContents = fileScanner.next();
-            JsonParser ToDoItemParser = new JsonParser();
-
-            ToDoItemList theListContainer = ToDoItemParser.parse(fileContents, ToDoItemList.class);
-            System.out.println("==============================================");
-            System.out.println("        Restored previous ToDoItem");
-            System.out.println("==============================================");
-            return theListContainer;
-        } catch (IOException ioException) {
-            // if we can't find the file or run into an issue restoring the object
-            // from the file, just return null, so the caller knows to create an object from scratch
-            return null;
-        }
-    }
+//    public ToDoItem retrieveList() {
+//        try {
+//            Scanner fileScanner = new Scanner(new File(thisUser.getUsername() + ".db"));
+//            fileScanner.useDelimiter("\\Z"); // read the input until the "end of the input" delimiter
+//            String fileContents = fileScanner.next();
+//////            JsonParser ToDoItemParser = new JsonParser();
+////
+////            ToDoItemList theListContainer = ToDoItemParser.parse(fileContents, ToDoItemList.class);
+////            System.out.println("==============================================");
+////            System.out.println("        Restored previous ToDoItem");
+////            System.out.println("==============================================");
+////            return theListContainer;
+//        } catch (IOException ioException) {
+//            // if we can't find the file or run into an issue restoring the object
+//            // from the file, just return null, so the caller knows to create an object from scratch
+//            return null;
+//        }
+//        return todoItems;
+//    }
     
 }
