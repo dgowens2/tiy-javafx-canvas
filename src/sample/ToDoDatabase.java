@@ -26,25 +26,40 @@ public class ToDoDatabase {
         stmt.setString(2, fullname);
         stmt.execute();
 
-        stmt = conn.prepareStatement("SELECT * FROM users where username = ?");
+        stmt = conn.prepareStatement("SELECT * FROM users WHERE username = ?");
         stmt.setString(1, username);
         ResultSet results = stmt.executeQuery();
         results.next();
         return results.getInt("id");
     }
 
+    public String selectUser(Connection conn, String username) throws SQLException{
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE username = ?");
+        stmt.setString(1, username);
+        ResultSet results = stmt.executeQuery();
+        results.next();
+        return results.getNString("username");
+    }
+
     public void deleteUser(Connection conn, String username) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("DELETE FROM users where username = ?");
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM users WHERE username = ?");
         stmt.setString(1, username);
         stmt.execute();
     }
 
-    public void insertToDo(Connection conn, String text, int userId) throws SQLException {
+    public int insertToDo(Connection conn, String text, int userId) throws SQLException {
 //        PreparedStatement stmt = conn.prepareStatement("INSERT INTO todos VALUES (NULL, ?, false)");
         PreparedStatement stmt = conn.prepareStatement("INSERT INTO todos VALUES (NULL, ?, false, ?)");
         stmt.setString(1, text);
         stmt.setInt(2, userId);
         stmt.execute();
+
+        stmt = conn.prepareStatement("SELECT * FROM todos WHERE text = ? AND user_id = ?");
+        stmt.setString(1, text);
+        stmt.setInt(2, userId);
+        ResultSet results = stmt.executeQuery();
+        results.next();
+        return results.getInt("id");
     }
 
     public static ArrayList<ToDoItem> selectToDos(Connection conn) throws SQLException {
@@ -55,14 +70,15 @@ public class ToDoDatabase {
             int id = results.getInt("id");
             String text = results.getString("text");
             boolean isDone = results.getBoolean("is_done");
-            items.add(new ToDoItem(id, text, isDone));
+            int userId = results.getInt("user_id");
+            items.add(new ToDoItem(id, text, isDone, userId));
         }
         return items;
     }
 
     public ArrayList<ToDoItem> selectToDosForUser(Connection conn, int userID) throws SQLException {
         ArrayList<ToDoItem> items = new ArrayList<>();
-        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos " +
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos" +
                 "INNER JOIN users ON todos.user_id = users.id " +
                 "WHERE users.id = ?");
         stmt.setInt(1, userID);
@@ -72,7 +88,8 @@ public class ToDoDatabase {
             int id = results.getInt("id");
             String text = results.getString("text");
             boolean isDone = results.getBoolean("is_done");
-            items.add(new ToDoItem(id, text, isDone));
+            int userId = results.getInt("user_id");
+            items.add(new ToDoItem(id, text, isDone, userId));
         }
         return items;
     }

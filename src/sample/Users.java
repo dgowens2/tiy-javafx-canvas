@@ -12,6 +12,12 @@ public class Users {
     public  Users(){
     }
 
+    public Users(String username, String fullName, int userId) {
+        this.username = username;
+        this.fullName = fullName;
+//        this.userId = userId;
+    }
+
     public Users(String username) {
         this.username = username;
     }
@@ -22,12 +28,6 @@ public class Users {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public Users(String username, String fullName, int userId) {
-        this.username = username;
-        this.fullName = fullName;
-        this.userId = userId;
     }
 
     public String getFullName() {

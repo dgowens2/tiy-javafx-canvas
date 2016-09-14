@@ -9,6 +9,8 @@ import javafx.scene.control.TextField;
 
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Scanner;
@@ -22,28 +24,44 @@ public class Controller implements Initializable {
 
     ObservableList<ToDoItem> todoItems = FXCollections.observableArrayList();
     ArrayList<ToDoItem> savableList = new ArrayList<ToDoItem>();
+    ArrayList<Users> userList = new ArrayList<Users>();
     String fileName = "todos.db";
-    ToDoDatabase database;
+    ToDoDatabase tdDatabase;
     Connection conn;
     public String username;
-    public int userId;
-    Users thisUser;
+    String fullName;
+    int userId;
+    Users thisUser = new Users();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        System.out.print("Please enter your email address: ");
-        Scanner inputScanner = new Scanner(System.in);
-        thisUser.setUsername(inputScanner.nextLine());
+        System.out.println("Welcome to the database. Do you have an account?\n1. Yes\n2. No");
 
-        if (thisUser.getUsername() != null) {
-//            fileName = username + ".json";
-            fileName = thisUser.getUsername() + ".db";
+        Scanner inputScanner = new Scanner(System.in);
+        int userSelection = inputScanner.nextInt();
+
+        if (userSelection == 1) {
+            selectUser();
+        } else if (userSelection == 2) {
+            addUser();
         }
 
-        System.out.println("Checking existing list ...");
+//        System.out.print("Please enter your email address: ");
+
+        System.out.println("Please create a new user");
+        Scanner inputScanner = new Scanner(System.in);
+        username = inputScanner.nextLine();
+        System.out.println(username);
+
+        System.out.println("Please enter your full name");
+        fullName = inputScanner.nextLine();
+
+//        System.out.println("Checking existing list ...");
 //        ToDoItemList retrievedList = retrieveList();
-        database = new ToDoDatabase();
+        tdDatabase = new ToDoDatabase();
+
+
 
 //        if (retrievedList != null) {
 //            for (ToDoItem item : retrievedList.todoItems) {
@@ -51,18 +69,27 @@ public class Controller implements Initializable {
 //            }
 //        }
 
-//        try {
-//            database.init();
-//            conn = DriverManager.getConnection(database.DB_URL);
-//            savableList = database.selectToDos(conn);
-//
-//            for (ToDoItem item : savableList) {
-//                todoItems.add(item);
-//            }
-//
-//        } catch (Exception exception) {
-//            exception.printStackTrace();
-//        }
+        try {
+            tdDatabase.init();
+            conn = DriverManager.getConnection(tdDatabase.DB_URL);
+
+            if (username != null) {
+                System.out.println(username);
+                System.out.println(fullName);
+                thisUser.setUsername(username);
+                thisUser.setFullName(fullName);
+//            fileName = username + ".json";
+                addUser();
+            }
+            savableList = tdDatabase.selectToDos(conn);
+
+            for (ToDoItem item : savableList) {
+                todoItems.add(item);
+            }
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
 
 
 
@@ -84,9 +111,8 @@ public class Controller implements Initializable {
     public void addItem() {
         try {
             System.out.println("Adding item ...");
-            database.insertToDo(conn, todoText.getText(), userId);
-            todoItems.add(new ToDoItem(todoText.getText()));
-
+            int todoId = tdDatabase.insertToDo(conn, todoText.getText(), userId);
+            todoItems.add(new ToDoItem(todoId, todoText.getText(),false, userId));
             todoText.setText("");
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -95,12 +121,10 @@ public class Controller implements Initializable {
 
     public void addUser() {
         try {
-            System.out.println("Adding item ...");
-//            database.insertUser(conn, username, );
-            database.insertToDo(conn, todoText.getText(), userId);
-            todoItems.add(new ToDoItem(todoText.getText()));
-
-            todoText.setText("");
+            System.out.println("Adding user ...");
+            userId = tdDatabase.insertUser(conn, thisUser.getUsername(), thisUser.getFullName());
+            userList.add(new Users(thisUser.getFullName(), thisUser.getUsername(), userId));
+            System.out.println(thisUser.getFullName() + " " + thisUser.getUsername());
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -111,21 +135,29 @@ public class Controller implements Initializable {
             ToDoItem todoItem = (ToDoItem) todoList.getSelectionModel().getSelectedItem();
             System.out.println("Removing " + todoItem.text + " ...");
             todoItems.remove(todoItem);
-            database.deleteToDo(conn, todoItem.text);
+            tdDatabase.deleteToDo(conn, todoItem.text);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
     }
 
+    public void selectUser() {
+        try {
+            tdDatabase.selectUser(conn, thisUser.getUsername());
+
+        } catch (SQLException exception){
+            exception.printStackTrace();
+        }
+    }
     public void toggleItem() {
         try {
             System.out.println("Toggling item ...");
             ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
+            tdDatabase.toggleToDo(conn,todoItem.getId());
             if (todoItem != null) {
                 todoItem.isDone = !todoItem.isDone;
                 todoList.setItems(null);
                 todoList.setItems(todoItems);
-                database.toggleToDo(conn, todoItem.id);
             }
         } catch (Exception exception){
             exception.printStackTrace();
