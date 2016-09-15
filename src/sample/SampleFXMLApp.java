@@ -12,6 +12,7 @@ import javafx.stage.WindowEvent;
 
 public class SampleFXMLApp extends Application {
 
+
     public static void main(String[] args) {
 
         System.out.println("Welcome to the TIY TODO App");

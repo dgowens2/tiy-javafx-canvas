@@ -35,65 +35,55 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        System.out.println("Welcome to the database. Do you have an account?\n1. Yes\n2. No");
-
-        Scanner inputScanner = new Scanner(System.in);
-        int userSelection = inputScanner.nextInt();
-
-        if (userSelection == 1) {
-            selectUser();
-        } else if (userSelection == 2) {
-            addUser();
-        }
-
-//        System.out.print("Please enter your email address: ");
-
-        System.out.println("Please create a new user");
-        Scanner inputScanner = new Scanner(System.in);
-        username = inputScanner.nextLine();
-        System.out.println(username);
-
-        System.out.println("Please enter your full name");
-        fullName = inputScanner.nextLine();
-
-//        System.out.println("Checking existing list ...");
-//        ToDoItemList retrievedList = retrieveList();
         tdDatabase = new ToDoDatabase();
-
-
-
-//        if (retrievedList != null) {
-//            for (ToDoItem item : retrievedList.todoItems) {
-//                todoItems.add(item);
-//            }
-//        }
 
         try {
             tdDatabase.init();
             conn = DriverManager.getConnection(tdDatabase.DB_URL);
 
-            if (username != null) {
-                System.out.println(username);
-                System.out.println(fullName);
-                thisUser.setUsername(username);
-                thisUser.setFullName(fullName);
-//            fileName = username + ".json";
-                addUser();
-            }
-            savableList = tdDatabase.selectToDos(conn);
+            System.out.println("Welcome to the database. Would you like to create a new account?\n1. Yes\n2. No\n3. I already have one");
+            Scanner userInput = new Scanner(System.in);
 
-            for (ToDoItem item : savableList) {
-                todoItems.add(item);
-            }
+            int userSelection = Integer.valueOf(userInput.nextInt());
 
-        } catch (Exception exception) {
+            if (userSelection == 2 || userSelection == 3) {
+                System.out.println("Please enter your email address: ");
+                username = userInput.nextLine();
+                thisUser = tdDatabase.selectUser(conn, username);
+
+                todoItems.addAll(tdDatabase.selectToDosForUser(conn, thisUser.getUserId()));
+
+                if (thisUser != null) {
+                    userId = thisUser.getUserId();
+                    savableList = tdDatabase.selectToDosForUser(conn, userId);
+                    if (savableList != null) {
+                        for (ToDoItem item : savableList) {
+                            todoItems.add(item);
+                        }
+                    }
+                }
+            }
+                else if (userSelection == 1) {
+                    System.out.println("Please enter your email address");
+                    String newUsername = userInput.nextLine();
+
+                    System.out.println("Please enter your full name");
+                    String newFullName = userInput.nextLine();
+                    thisUser.setUsername(newUsername);
+                    thisUser.setFullName(newFullName);
+                    userId = tdDatabase.insertUser(conn, thisUser.getUsername(), thisUser.getFullName());
+                    addUser();
+                }
+
+
+//            savableList = tdDatabase.selectToDos(conn);
+////
+//            for (ToDoItem item : savableList) {
+//                    todoItems.add(item);
+//            }
+        } catch (SQLException exception) {
             exception.printStackTrace();
         }
-
-
-
-
         todoList.setItems(todoItems);
     }
 
@@ -113,6 +103,7 @@ public class Controller implements Initializable {
             System.out.println("Adding item ...");
             int todoId = tdDatabase.insertToDo(conn, todoText.getText(), userId);
             todoItems.add(new ToDoItem(todoId, todoText.getText(),false, userId));
+            System.out.println(todoText.getText() + " " + userId);
             todoText.setText("");
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -123,8 +114,9 @@ public class Controller implements Initializable {
         try {
             System.out.println("Adding user ...");
             userId = tdDatabase.insertUser(conn, thisUser.getUsername(), thisUser.getFullName());
+            thisUser.setUserId(userId);
             userList.add(new Users(thisUser.getFullName(), thisUser.getUsername(), userId));
-            System.out.println(thisUser.getFullName() + " " + thisUser.getUsername());
+            System.out.println(thisUser.getFullName() + " " + thisUser.getUsername() + " " + userId);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -141,14 +133,35 @@ public class Controller implements Initializable {
         }
     }
 
-    public void selectUser() {
+    public void selectTodosFromUser() {
         try {
-            tdDatabase.selectUser(conn, thisUser.getUsername());
-
-        } catch (SQLException exception){
+            tdDatabase.selectToDosForUser(conn, userId);
+            System.out.println("seledted todos from user");
+        } catch (SQLException exception) {
             exception.printStackTrace();
         }
     }
+
+//    public void selectUser(Scanner inputScanner) {
+//        try {
+////        System.out.print("Please enter your email address: ");
+////        username = inputScanner.nextLine();
+////        tdDatabase.selectUser(conn, username);
+////        thisUser.getUserId();
+////
+////        if (thisUser != null) {
+////            userId = thisUser.getUserId();
+////            savableList = tdDatabase.selectToDosForUser(conn, userId);
+////            if (savableList != null) {
+////                for (ToDoItem item : savableList) {
+////                    todoItems.add(item);
+////                }
+////            }
+//        } catch (SQLException exception){
+//                exception.printStackTrace();
+//        }
+//    }
+
     public void toggleItem() {
         try {
             System.out.println("Toggling item ...");
@@ -162,7 +175,6 @@ public class Controller implements Initializable {
         } catch (Exception exception){
             exception.printStackTrace();
         }
-
     }
 
     public void saveList() {

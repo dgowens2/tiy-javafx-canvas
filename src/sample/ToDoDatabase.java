@@ -33,12 +33,22 @@ public class ToDoDatabase {
         return results.getInt("id");
     }
 
-    public String selectUser(Connection conn, String username) throws SQLException{
+    public Users selectUser(Connection conn, String username) throws SQLException{
         PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE username = ?");
         stmt.setString(1, username);
         ResultSet results = stmt.executeQuery();
-        results.next();
-        return results.getNString("username");
+
+        if(results != null){
+            Users thisUser = new Users();
+            while (results.next()) {
+                thisUser.setUserId(results.getInt("id"));
+                thisUser.setUsername("username");
+                thisUser.setFullName("fullname");
+            }
+            return thisUser;
+        } else {
+            return null;
+        }
     }
 
     public void deleteUser(Connection conn, String username) throws SQLException {
@@ -78,7 +88,7 @@ public class ToDoDatabase {
 
     public ArrayList<ToDoItem> selectToDosForUser(Connection conn, int userID) throws SQLException {
         ArrayList<ToDoItem> items = new ArrayList<>();
-        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos" +
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos " +
                 "INNER JOIN users ON todos.user_id = users.id " +
                 "WHERE users.id = ?");
         stmt.setInt(1, userID);
