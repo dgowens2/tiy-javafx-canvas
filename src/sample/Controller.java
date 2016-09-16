@@ -44,7 +44,7 @@ public class Controller implements Initializable {
             System.out.println("Welcome to the database. Would you like to create a new account?\n1. Yes\n2. No\n3. I already have one");
             Scanner userInput = new Scanner(System.in);
 
-            int userSelection = Integer.valueOf(userInput.nextInt());
+            int userSelection = Integer.valueOf(userInput.nextLine());
 
             if (userSelection == 2 || userSelection == 3) {
                 System.out.println("Please enter your email address: ");
@@ -53,34 +53,26 @@ public class Controller implements Initializable {
 
                 todoItems.addAll(tdDatabase.selectToDosForUser(conn, thisUser.getUserId()));
 
-                if (thisUser != null) {
-                    userId = thisUser.getUserId();
-                    savableList = tdDatabase.selectToDosForUser(conn, userId);
-                    if (savableList != null) {
-                        for (ToDoItem item : savableList) {
-                            todoItems.add(item);
-                        }
-                    }
-                }
+//                if (thisUser != null) {
+//                    userId = thisUser.getUserId();
+//                    savableList = tdDatabase.selectToDosForUser(conn, userId);
+//                    if (savableList != null) {
+//                        for (ToDoItem item : savableList) {
+//                            todoItems.add(item);
+//                        }
+//                    }
+//                }
+            } else if (userSelection == 1) {
+                System.out.println("Please enter your email address");
+                String newUsername = userInput.nextLine();
+
+                System.out.println("Please enter your full name");
+                String newFullName = userInput.nextLine();
+                thisUser.setUsername(newUsername);
+                thisUser.setFullName(newFullName);
+                addUser();
+
             }
-                else if (userSelection == 1) {
-                    System.out.println("Please enter your email address");
-                    String newUsername = userInput.nextLine();
-
-                    System.out.println("Please enter your full name");
-                    String newFullName = userInput.nextLine();
-                    thisUser.setUsername(newUsername);
-                    thisUser.setFullName(newFullName);
-                    userId = tdDatabase.insertUser(conn, thisUser.getUsername(), thisUser.getFullName());
-                    addUser();
-                }
-
-
-//            savableList = tdDatabase.selectToDos(conn);
-////
-//            for (ToDoItem item : savableList) {
-//                    todoItems.add(item);
-//            }
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
