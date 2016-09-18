@@ -19,7 +19,7 @@ public class SampleFXMLApp extends Application {
 
         launch(args);
 
-//        SELECT * FROM FROM todod INNER JOIN users ON users.id = todo.user_id WHERE users.id = 1
+//        SELECT * FROM FROM todos INNER JOIN users ON users.id = todo.user_id WHERE users.id = 1
     }
 
     @Override

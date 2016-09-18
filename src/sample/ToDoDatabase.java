@@ -15,7 +15,6 @@ public class ToDoDatabase {
         Server.createWebServer().start();
         Connection conn = DriverManager.getConnection(DB_URL);
         Statement stmt = conn.createStatement();
-//        stmt.execute("CREATE TABLE IF NOT EXISTS todos (id IDENTITY, text VARCHAR, is_done BOOLEAN)");
         stmt.execute("CREATE TABLE IF NOT EXISTS todos (id IDENTITY, text VARCHAR, is_done BOOLEAN, user_id INT)");
         stmt.execute("CREATE TABLE IF NOT EXISTS users (id IDENTITY, username VARCHAR, fullname VARCHAR)");
     }
@@ -58,7 +57,6 @@ public class ToDoDatabase {
     }
 
     public int insertToDo(Connection conn, String text, int userId) throws SQLException {
-//        PreparedStatement stmt = conn.prepareStatement("INSERT INTO todos VALUES (NULL, ?, false)");
         PreparedStatement stmt = conn.prepareStatement("INSERT INTO todos VALUES (NULL, ?, false, ?)");
         stmt.setString(1, text);
         stmt.setInt(2, userId);

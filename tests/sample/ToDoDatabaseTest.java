@@ -21,9 +21,7 @@ public class ToDoDatabaseTest {
 
     @Before
     public void setUp() throws Exception {
-//        System.out.println("setUp() is running!");
         if (todoDatabase == null) {
-//            System.out.println("Initializing the tdDatabase this time around (should only see this once!)");
             todoDatabase = new ToDoDatabase();
             todoDatabase.init();
         }

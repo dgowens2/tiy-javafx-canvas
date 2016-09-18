@@ -12,7 +12,9 @@
    <children>
       <ToolBar prefHeight="40.0" prefWidth="200.0">
         <items>
-          <Button mnemonicParsing="false" onAction="#saveToDoList" text="Save ToDos" />
+            <Button mnemonicParsing="false" onMouseClicked="#toggleItem" text="Toggle" />
+          <Button mnemonicParsing="false" onMouseClicked="#toggleAll" text="Toggle All" />
+            <Button mnemonicParsing="false" onMouseClicked="#removeItem" text="Delete Item" />
         </items>
       </ToolBar>
       <HBox prefHeight="12.0" prefWidth="600.0" VBox.vgrow="NEVER">
@@ -20,6 +22,6 @@
             <TextField fx:id="todoText" onAction="#addItem" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
-      <ListView fx:id="todoList" onMouseClicked="#toggleItem" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+      <ListView fx:id="todoList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
    </children>
 </VBox>

@@ -25,11 +25,9 @@ public class Controller implements Initializable {
     ObservableList<ToDoItem> todoItems = FXCollections.observableArrayList();
     ArrayList<ToDoItem> savableList = new ArrayList<ToDoItem>();
     ArrayList<Users> userList = new ArrayList<Users>();
-    String fileName = "todos.db";
     ToDoDatabase tdDatabase;
     Connection conn;
     public String username;
-    String fullName;
     int userId;
     Users thisUser = new Users();
 
@@ -53,15 +51,6 @@ public class Controller implements Initializable {
 
                 todoItems.addAll(tdDatabase.selectToDosForUser(conn, thisUser.getUserId()));
 
-//                if (thisUser != null) {
-//                    userId = thisUser.getUserId();
-//                    savableList = tdDatabase.selectToDosForUser(conn, userId);
-//                    if (savableList != null) {
-//                        for (ToDoItem item : savableList) {
-//                            todoItems.add(item);
-//                        }
-//                    }
-//                }
             } else if (userSelection == 1) {
                 System.out.println("Please enter your email address");
                 String newUsername = userInput.nextLine();
@@ -125,35 +114,6 @@ public class Controller implements Initializable {
         }
     }
 
-    public void selectTodosFromUser() {
-        try {
-            tdDatabase.selectToDosForUser(conn, userId);
-            System.out.println("seledted todos from user");
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-        }
-    }
-
-//    public void selectUser(Scanner inputScanner) {
-//        try {
-////        System.out.print("Please enter your email address: ");
-////        username = inputScanner.nextLine();
-////        tdDatabase.selectUser(conn, username);
-////        thisUser.getUserId();
-////
-////        if (thisUser != null) {
-////            userId = thisUser.getUserId();
-////            savableList = tdDatabase.selectToDosForUser(conn, userId);
-////            if (savableList != null) {
-////                for (ToDoItem item : savableList) {
-////                    todoItems.add(item);
-////                }
-////            }
-//        } catch (SQLException exception){
-//                exception.printStackTrace();
-//        }
-//    }
-
     public void toggleItem() {
         try {
             System.out.println("Toggling item ...");
@@ -165,6 +125,22 @@ public class Controller implements Initializable {
                 todoList.setItems(todoItems);
             }
         } catch (Exception exception){
+            exception.printStackTrace();
+        }
+    }
+
+    public void toggleAll() {
+        System.out.println("Toggling items ...");
+        try {
+            for (ToDoItem todoItem : todoItems) {
+                tdDatabase.toggleToDo(conn, todoItem.getId());
+                if (todoItem != null) {
+                    todoItem.isDone = !todoItem.isDone;
+                    todoList.setItems(null);
+                    todoList.setItems(todoItems);
+                }
+            }
+        } catch (SQLException exception) {
             exception.printStackTrace();
         }
     }
